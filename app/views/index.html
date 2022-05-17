@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Bot Configuration Page</title>
+    <link rel="icon" href="./assets/twitter.png" type="image/x-icon">
+</head>
+
+<body>
+    <div id="mainDiv">
+        <div>
+            <h1>Twitter Bot Configuration</h1>
+        </div>
+        <div>
+            <form id="tagForm">
+                <label for="tag">#Tag to Monitor:</label>
+                <input type="text" id="tag" name="tag" placeholder="EarthDay2022">
+                <button class="monitorButton">Monitor Tag</button>
+                <br><br>
+            </form>
+        </div>
+        <div id="monitorStatusDiv">
+            <div>
+                Lookup for #EarthDay2022 is in progress along with twitter account from file BotDataEarthDay.csv
+            </div>
+            <div>
+                File Preview
+            </div>
+            <div>
+                <table id="previewTable">
+                    <tr>
+                        <th>Account Handle</th>
+                        <th>Account ID</th>
+                        <th>Score</th>
+                        <th>More</th>
+                    </tr>
+                    <tr>
+                        <td>Handle</td>
+                        <td>ID</td>
+                        <td>Score</td>
+                        <td>More</td>
+                    </tr>
+                    <tr>
+                        <td>Handle</td>
+                        <td>ID</td>
+                        <td>Score</td>
+                        <td>More</td>
+                    </tr>
+                    <tr>
+                        <td>Handle</td>
+                        <td>ID</td>
+                        <td>Score</td>
+                        <td>More</td>
+                    </tr>
+                    <tr>
+                        <td>Handle</td>
+                        <td>ID</td>
+                        <td>Score</td>
+                        <td>More</td>
+                    </tr>
+
+                </table>
+            </div>
+
+        </div>
+
+        <br>
+
+        <div id="fetchIDdiv">
+            <div>
+                <h3>File Upload to Fetch Account ID</h3>
+            </div>
+            <div>
+                <label>Column Number for Account Handle</label>
+                <input type="number" placeholder="3" width="20px" id="accountHandleColumn" for="accountHandleColumn">
+            </div>
+            <div>
+                <button>Select File</button>
+                <button id="fetchIDUpload">FetchID</button>
+            </div>
+            <br>
+        </div>
+        <br>
+        <div>
+            File Upload/Select to Monitor Accounts
+        </div>
+
+        <br>
+
+        <div id="scoringDiv">
+            <div>
+                <h2>Upload a score range and statment file</h2>
+            </div>
+            <div>
+                <button>Select File</button>
+                <button id="updateScoreStatmentButton">Update Score and Statments</button>
+            </div>
+            <br>
+        </div>
+
+        <br>
+
+    </div>
+
+    <script src="/javascript/index.js"></script>
+    <link rel="stylesheet" type="text/css" href="/visualization/index.css" />
+</body>
+
+</html>
