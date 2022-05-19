@@ -23,7 +23,7 @@ async function testMe() {
                 name: row[0],
                 handle: row[1],
                 Score: row[2],
-                Ticker: row[3]
+                Ticker: row[3],
             }
             wholeData.push(dataObj);
             //console.log('A row arrived: ', row);

@@ -2,7 +2,6 @@ const needle = require('needle');
 require('dotenv').config()
 
 //const url = `https://api.twitter.com/2/users/${userId}/tweets`;
-let url = "";
 
 // The code below sets the bearer token from your environment variables
 // To set environment variables on macOS or Linux, run the export command below from the terminal:
@@ -10,9 +9,7 @@ let url = "";
 const bearerToken = process.env.BearerToken;
 
 let fetchTweets = async (userId) => {
-    url = `https://api.twitter.com/2/users/${userId}/tweets`;
-
-    let userTweets = [];
+    let url = `https://api.twitter.com/2/users/${userId}/tweets`;
 
     // we request the author_id expansion so that we can print out the user name later
     let params = {
@@ -28,17 +25,11 @@ let fetchTweets = async (userId) => {
         }
     }
 
-    let hasNextPage = true;
-    let nextToken = null;
-    let userName;
-    console.log("Retrieving Tweets...");
-
     try {
         const resp = await needle('get', url, params, options);
         console.log("resp.statusCode: " + resp.statusCode);
         if (resp.statusCode != 200) {
-            console.log(`${resp.statusCode} ${resp.statusMessage}:\n${resp.body}`);
-            return;
+            return [];
         } else {
             return resp.body.data;
         }
@@ -52,7 +43,7 @@ function filterTweets(tweetsArray, hashtag) {
     let tweetIDArray = [];
     let tag = "#" + hashtag;
     
-    if (tweetsArray != undefined) {
+    if (tweetsArray != undefined && tweetsArray != null && tweetsArray.length != 0 ) {
 
         for (let i = 0; i < tweetsArray.length; i++) {
             if (tweetsArray[i].text.toLowerCase().includes(tag)) {

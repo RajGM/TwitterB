@@ -1,0 +1,6 @@
+Start,End,Comment
+71,100, {companyname} {TK}, your leading eco-performance rates {XX%}, a grade A on HIP's Earth Pillar. You are building towards a net positive world with more efficient energy, water, waste, and GHG per sales dollar. Keep progressing forward!
+51,70, {companyname} {TK}, your positive eco-performance rates {XX%}, or a grade B on HIP's Earth Pillar. While not yet fully net positive for GHGs, energy, water, waste overall, you are building momentum to be an eco-leader!
+41,50, {companyname} {TK}, your lagging eco-performance rates {XX%}, or a grade C on HIP's Earth Pillar. Keep reporting more eco-metrics on GHGs, energy, water, waste! Your current performance is net negative on the planet and our communities!
+11,40, {companyname} {TK}, your lagging eco-performance rates {XX%}, or a grade D on HIP's Earth Pillar. Investors need more transparency into your GHGs, energy use, water use, and waste tons, but also your firm needs to be more eco-efficient!
+0,10, {companyname} {TK}, your opaque eco-performance rates {XX%} or grade F on HIP's Earth Pillar! Quantitative information on GHGs, energy use, water use, and waste tons are invisible to the outside world, please start reporting transparently!

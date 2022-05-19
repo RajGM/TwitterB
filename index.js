@@ -2,19 +2,16 @@ const express = require('express');
 
 const app = express();
 const bodyparser = require("body-parser");
+
 var fs = require("fs");
-
-const getTweetAndFilter = require("./getTweetsAndFilter");
-const CsvReadableStream = require('csv-reader');
-let inputStream = fs.createReadStream('./BotDataEarthDay.csv', 'utf8');
-
-let CSVdata = [];
-
-readCSVData();
-
+const Twitter = require('twit');
 const callbackURL = "http://127.0.0.1:8000";
 
-let allKeys = {};
+const getTweetAndFilter = require("./getTweetsAndFilter");
+
+const CsvReadableStream = require('csv-reader');
+let inputStreamAccounts = fs.createReadStream('./accountID.csv', 'utf8');
+let inputStreamComments = fs.createReadStream('./comments.csv', 'utf8');
 
 require('dotenv').config()
 
@@ -32,12 +29,14 @@ app.use(bodyparser.json());
 var route = require('./router');
 app.use('/', route);
 
-// Twitter API init
-const TwitterApi = require('twitter-api-v2').default;
-const twitterClient = new TwitterApi({
-    clientId: process.env.ClientId,
-    clientSecret: process.env.ClientSecret,
-});
+//Twitter API Twit init
+// const Client = new Twitter({
+//     consumer_key: process.env.ClientId,
+//     consumer_secret: process.env.ClientSecret,
+//     access_token: process.env.access_token,
+//     access_token_secret: process.env.access_token_secret,
+//     strictSSL: true,
+// })
 
 //starting server
 var server = app.listen(app.get('port'), function () {
@@ -45,151 +44,157 @@ var server = app.listen(app.get('port'), function () {
     console.log("You application is running. You should be able to connect to it on http://localhost:" + app.get('port'));
 });
 
-let tweet = "Long time no tweet #Bitcoin  ";
-let linkTest = "https://twitter.com/RajGM_Hacks/status/1511364821320892416";
-let finalTweet = tweet + linkTest;
-
-let code = "";
-
-let globalClient;
-let globalAccessToken;
-let globalRefreshToken;
-
-async function allCall() {
-
-    //auth Step
-    const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(
-        callbackURL,
-        { scope: ['tweet.read', 'tweet.write', 'users.read', 'offline.access'] }
-    );
-    console.log("url:", url);
-    console.log("codeVerifier:", codeVerifier);
-    console.log("state:", state);
-
-    allKeys = {
-        "url": url,
-        "codeVerifier": codeVerifier,
-        "state": state
-    }
-
-    //to here
-
-    const readline = require('readline').createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
-    await readline.question('Enter code?', async name => {
-        code = name;
-        console.log(`Hey there ${name}!`);
-
-        const {
-            client: loggedClient,
-            accessToken,
-            refreshToken,
-        } = await twitterClient.loginWithOAuth2({
-            code,
-            codeVerifier,
-            redirectUri: callbackURL,
-        });
-
-        globalClient = loggedClient;
-        globalAccessToken = accessToken;
-        globalRefreshToken = refreshToken;
-
-        allKeys["accessToken"] = accessToken;
-        allKeys["refreshToken"] = refreshToken;
-
-        console.log("AccessToken: ", accessToken);
-        console.log("RefreshToken: ", refreshToken);
-
-        console.log("All Keys: ", allKeys);
-
-        console.log(await loggedClient.v2.me());
-
-        const {
-            client: refreshedClient,
-            refreshToken: newRefreshToken,
-        } = await twitterClient.refreshOAuth2Token(refreshToken);
-
-        const { data } = await refreshedClient.v2.tweet(
-            finalTweet
-        );
-
-        //Call a function which reiterates infinitely 
-        setInterval(testme(data), 1000);
-       
-        console.log("Tweet DATA:", data);
-
-        readline.close();
-    });
-
-}
-
 function createStatusLink(userName, tweetID) {
     return `https://twitter.com/${userName}/status/${tweetID}`;
 }
 
-//setInterval(testme, 6000);
-    
-async function testme(moreText){
-    console.log("TESTING TESTME");
-    console.log("moreText:",moreText);
-} 
+async function postTweet(textToPost, retweetLink) {
 
-//https://twitter.com/RajGM_Hacks/status/1511364821320892416
-//https://twitter.com/user_name/status/tweetID
-//  let testID ="1502246747690930178";
-//  let testTag = "bitcoin";
-//  getTweetAndFilter(testID,testTag);
-////working all upto this point
-//let tweetID = ['1517849711834984449', '1517582741558411266'];
+    Client.post('statuses/update', { status: textToPost, attachment_url: retweetLink }, function (err, data, response) {
+        if (err) return console.error(`Encountered error quoting tweet with id: ${tweet.id_str}, ${new Error(err.message)}`)
+        console.log(`Quoted a tweet with id: ${tweet.id_str}`)
+        console.log("Tweet DATA:", data);
+        console.log("Response data:", response);
+    })
+
+};
+
+async function readAccountCSVData() {
+
+    let allData = [];
+    return new Promise(async (resolve, reject) => {
+        await inputStreamAccounts
+            .pipe(new CsvReadableStream({ parseNumbers: true, parseBooleans: true, trim: true }))
+            .on('data', function (row) {
+                let dataObj = {
+                    name: row[0],
+                    Ticker: row[1],
+                    Score: row[2],
+                    handle: row[3],
+                    accountID: row[4]
+                }
+                allData.push(dataObj);
+            })
+            .on('end', function () {
+                resolve(allData);
+                //console.log('No more rows!');
+            })
+
+    });
+
+}
+
+async function readCommentsCSVData() {
+
+    let allData = [];
+    return new Promise(async (resolve, reject) => {
+        await inputStreamComments
+            .pipe(new CsvReadableStream({ parseNumbers: true, parseBooleans: true, trim: true }))
+            .on('data', function (row) {
+                let rowLength = row.length;
+                let comment = "";
+                for (var i = 2; i < rowLength; i++) {
+                    comment += row[i] + " ";
+                }
+                let dataObj = {
+                    rangeStart: parseFloat(row[0]),
+                    rangeEnd: parseFloat(row[1]),
+                    Comment: comment,
+                }
+                allData.push(dataObj);
+            })
+            .on('end', function () {
+                resolve(allData);
+                //console.log('No more rows!');
+            })
+
+    });
+
+}
 
 async function passAccountToCheck(accountID, tag) {
+    console.log("Inside passAccountToCheck");
+    console.log("All params:", accountID, tag);
     let tweetArraywithTag = [];
-    for (var i = 0; i < 5; i++) {
-        let tweetArray = await getTweetAndFilter(accountID, tag);
-        console.log("tweetArray: ", tweetArray);
 
-        if (tweetArray != undefined) {
-            //do retweet
-            console.log("Do a retweet");
+    let tweetArray = await getTweetAndFilter(accountID, tag);
+    console.log("tweetArray: ", tweetArray);
+
+    if (tweetArray != undefined) {
+        return tweetArray;
+    } else {
+        return tweetArraywithTag;
+    }
+
+}
+
+function buildCommentBasedOnScore(CSVdataAccounts, CSVdataComments, score, index) {
+    let commentTemplate = getComment(CSVdataComments, score);
+    commentTemplate = commentTemplate.replace("{companyname}", CSVdataAccounts[index].name);
+    commentTemplate = commentTemplate.replace("{TK}", CSVdataAccounts[index].Ticker);
+    commentTemplate = commentTemplate.replace("{XX%}", score);
+    return commentTemplate;
+}
+
+function getComment(CSVdataComments, score) {
+    for (var i = 0; i < CSVdataComments.length; i++) {
+        if (score >= CSVdataComments[i].rangeStart && score <= CSVdataComments[i].rangeEnd) {
+            return CSVdataComments[i].Comment;
+        }
+    }
+}
+
+async function checkAllAccounts(CSVdataAccounts, CSVdataComments, tag) {
+    console.log("Inside checkAllAccounts");
+    //Implement rate limiting here
+    //For checking
+    //For posting
+
+    for (var i = 1; i < 2; i++) {
+
+        if (i % 90 == 0) {
+            //pause program for 3 minutes
+            //implement rate limiting here
+            //implement when accounts are less than 90
+        }
+
+        if (CSVdataAccounts[i].accountID != undefined && typeof CSVdataAccounts[i].accountID == "number") {
+
+            let tweetCheckStatus = await passAccountToCheck(CSVdataAccounts[i].accountID, tag);
+            for (let tweetFoundLength = 0; tweetFoundLength < tweetCheckStatus.length; tweetFoundLength++) {
+                let tweetLink = createStatusLink(CSVdataAccounts[i].handle, tweetCheckStatus[tweetFoundLength]);
+                let text2post = buildCommentBasedOnScore(CSVdataAccounts, CSVdataComments, CSVdataAccounts[i].Score, i);
+                console.log("tweetLink:", tweetLink);
+                console.log("text2post:", text2post);
+
+                //postTweet(text2post, tweetLink);
+                CSVdataAccounts.splice(i, 1);
+                i--;
+            }
+
         }
 
     }
 
 }
 
-async function testFetchAndFilter(){
-    let testID = "1502246747690930178";
-    let testTag = "bitcoin";
-    let tweetArray = await getTweetAndFilter(testID, testTag);
-    console.log("tweetArray:",tweetArray);
+async function finalCall() {
+    let CSVdataAccounts = [];
+    let CSVdataComments = [];
+
+    let tag = "aapi";
+    CSVdataAccounts = await readAccountCSVData();
+    console.log(CSVdataAccounts[1]);
+    CSVdataComments = await readCommentsCSVData();
+    await checkAllAccounts(CSVdataAccounts, CSVdataComments, tag);
+
+    setInterval(checkAllAccounts, 5000, CSVdataAccounts, CSVdataComments, tag);
+
 }
 
-//testFetchAndFilter();
+finalCall();
 
-//passAccountToCheck("1502246747690930178","bitcoin");
-
-//allCall();
-
-async function readCSVData(){
-    await inputStream
-        .pipe(new CsvReadableStream({ parseNumbers: true, parseBooleans: true, trim: true }))
-        .on('data', function (row) {
-            let dataObj = {
-                name: row[0],
-                handle: row[1],
-                Score: row[2],
-                Ticker: row[3]
-            }
-            CSVdata.push(dataObj);
-            //console.log('A row arrived: ', row);
-        })
-        .on('end', function () {
-            console.log("readCSVData:", CSVdata);
-
-            //console.log("wholeData:", wholeData);
-            //console.log('No more rows!');
-        })
-} 
+async function testme(moreText) {
+    console.log("TESTING TESTME");
+    console.log("moreText:", moreText);
+}

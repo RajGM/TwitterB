@@ -8,9 +8,9 @@ var path = require('path');
 // @desc    for sendig token
 // @access  PUBLIC
 router.get('/*',function(req,res){
-    console.log("url:",req.url);
-    console.log("params:",req.params);
-    res.sendFile(path.join(__dirname+'/app/views/'+'index.html'));
+    // console.log("url:",req.url);
+    // console.log("params:",req.params);
+     res.sendFile(path.join(__dirname+'/app/views/'+'index.html'));
     //res.json(req.url);
 })
 
