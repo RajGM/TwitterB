@@ -2,6 +2,7 @@ console.log("Working");
 
 let changeMonitorTagButton = document.getElementById("changeMonitorTagButton");
 let tag = document.getElementById("tag");
+let monitorStatusDiv = document.getElementById("monitorStatusDiv");
 
 tag.onchange = function () {
     console.log("tag:" + tag.value);
@@ -19,14 +20,12 @@ changeMonitorTagButton.onclick = function () {
     try {
         var xhttp = new XMLHttpRequest();
         xhttp.onload = function () {
-            var response = JSON.parse(this.responseText);
-            console.log(this.responseText);
-            if (response.logInfo == "Fail") {
-                console.log("Incorrect User Name or password");
-                //handle fail response here
-            } else if (response.logInfo == "Success") {
-                console.log("Success");
-                //handle success response here
+            console.log(this.status);
+            
+            if (this.status == "200") {
+                monitorStatusDiv.innerHTML = "Tag Change Done";
+            } else{
+                monitorStatusDiv.innerHTML = "Tag Change Failed";
             }
         };
         xhttp.open("POST", "/", true);

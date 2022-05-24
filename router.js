@@ -37,7 +37,7 @@ router.get('/', function (req, res) {
 // @access  PUBLIC
 router.post('/', function (req, res) {
      helperFunction(req.body.tag);
-     res.json({ "Success": "OK" });
+     res.status(200).send("Tag Change Done");
 })
 
 // @type    POST

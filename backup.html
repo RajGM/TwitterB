@@ -1,0 +1,42 @@
+<div id="fetchIDdiv">
+    <div>
+        <h3>File Upload to Fetch Account ID</h3>
+    </div>
+    <div>
+        <button id="idFetchButton">FetchID</button>
+    </div>
+    <br>
+</div>
+<br>
+
+<br>
+
+<div id="scoringDiv">
+    <div>
+        <h2>Upload a score range and statment file</h2>
+    </div>
+    <div>
+        <button id="commentsFileButton">Comments File</button>
+        <button id="accountsFileButton">Accounts File</button>
+    </div>
+
+    <div>
+
+        <form method="POST" action="/commentFile" enctype="multipart/form-data">
+            <div>
+                <label>Upload the pdf</label>
+                <input type="file" name="commentFile" />
+            </div>
+            <div>
+                <input type="submit" name="btn_upload_profile_pic" value="Upload" />
+
+                <br>
+            </div>
+        </form>
+
+    </div>
+
+    <br>
+</div>
+
+<br>
