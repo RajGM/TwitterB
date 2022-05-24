@@ -13,6 +13,10 @@ const CsvReadableStream = require('csv-reader');
 let inputStreamAccounts = fs.createReadStream('./accountID.csv', 'utf8');
 let inputStreamComments = fs.createReadStream('./comments.csv', 'utf8');
 
+let tagToMonitor = "earthday2022";
+
+const jsonfile = require('jsonfile')
+
 require('dotenv').config()
 
 app.use(express.static(__dirname + '/public'));
@@ -29,14 +33,14 @@ app.use(bodyparser.json());
 var route = require('./router');
 app.use('/', route);
 
-//Twitter API Twit init
-// const Client = new Twitter({
-//     consumer_key: process.env.ClientId,
-//     consumer_secret: process.env.ClientSecret,
-//     access_token: process.env.access_token,
-//     access_token_secret: process.env.access_token_secret,
-//     strictSSL: true,
-// })
+// Twitter API Twit init
+const Client = new Twitter({
+    consumer_key: process.env.Consumer_Key,
+    consumer_secret: process.env.Consumer_Secret,
+    access_token: process.env.access_token,
+    access_token_secret: process.env.access_token_secret,
+    strictSSL: true,
+})
 
 //starting server
 var server = app.listen(app.get('port'), function () {
@@ -50,9 +54,16 @@ function createStatusLink(userName, tweetID) {
 
 async function postTweet(textToPost, retweetLink) {
 
-    Client.post('statuses/update', { status: textToPost, attachment_url: retweetLink }, function (err, data, response) {
-        if (err) return console.error(`Encountered error quoting tweet with id: ${tweet.id_str}, ${new Error(err.message)}`)
-        console.log(`Quoted a tweet with id: ${tweet.id_str}`)
+    // Client.post('statuses/update', { status: textToPost, attachment_url: retweetLink }, function (err, data, response) {
+    //     if (err) return console.error(`Encountered error quoting tweet with id: ${retweetLink}, ${new Error(err.message)}`)
+    //     console.log(`Quoted a tweet with id: ${retweetLink}`)
+    //     console.log("Tweet DATA:", data);
+    //     console.log("Response data:", response);
+    // })
+
+    Client.post('statuses/update', { status: textToPost }, function (err, data, response) {
+        if (err) return console.error(`Encountered error quoting tweet with id: ${retweetLink}, ${new Error(err.message)}`)
+        console.log(`Quoted a tweet with id: ${retweetLink}`)
         console.log("Tweet DATA:", data);
         console.log("Response data:", response);
     })
@@ -146,6 +157,10 @@ function getComment(CSVdataComments, score) {
 
 async function checkAllAccounts(CSVdataAccounts, CSVdataComments, tag) {
     console.log("Inside checkAllAccounts");
+    loadTagToMonitor();
+
+
+
     //Implement rate limiting here
     //For checking
     //For posting
@@ -167,7 +182,7 @@ async function checkAllAccounts(CSVdataAccounts, CSVdataComments, tag) {
                 console.log("tweetLink:", tweetLink);
                 console.log("text2post:", text2post);
 
-                //postTweet(text2post, tweetLink);
+                //postTweet(text2post, tweetLink); //this is working 
                 CSVdataAccounts.splice(i, 1);
                 i--;
             }
@@ -182,17 +197,24 @@ async function finalCall() {
     let CSVdataAccounts = [];
     let CSVdataComments = [];
 
-    let tag = "aapi";
     CSVdataAccounts = await readAccountCSVData();
-    console.log(CSVdataAccounts[1]);
     CSVdataComments = await readCommentsCSVData();
-    await checkAllAccounts(CSVdataAccounts, CSVdataComments, tag);
+    await checkAllAccounts(CSVdataAccounts, CSVdataComments, tagToMonitor);
 
-    setInterval(checkAllAccounts, 5000, CSVdataAccounts, CSVdataComments, tag);
+    setInterval(checkAllAccounts, 5000, CSVdataAccounts, CSVdataComments, tagToMonitor);
 
 }
 
-finalCall();
+//finalCall();
+
+function loadTagToMonitor() {
+    let file = './tagFile.json'
+    jsonfile.readFile(file, function (err, obj) {
+        if (err) console.error(err)
+        tagToMonitor = obj.tag.replace("#", "");
+        console.log("LOADING TAGTO MONITOR:", tagToMonitor);
+    })
+}
 
 async function testme(moreText) {
     console.log("TESTING TESTME");

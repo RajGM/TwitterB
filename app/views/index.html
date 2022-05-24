@@ -14,55 +14,12 @@
             <h1>Twitter Bot Configuration</h1>
         </div>
         <div>
-            <form id="tagForm">
-                <label for="tag">#Tag to Monitor:</label>
-                <input type="text" id="tag" name="tag" placeholder="EarthDay2022">
-                <button class="monitorButton">Monitor Tag</button>
-                <br><br>
-            </form>
+            <label for="tag">#Tag to Monitor:</label>
+            <input type="text" id="tag" name="tag" placeholder="#EarthDay2022">
+            <button class="monitorButton" id="changeMonitorTagButton">Monitor Tag</button>
+            <br><br>
         </div>
         <div id="monitorStatusDiv">
-            <div>
-                Lookup for #EarthDay2022 is in progress along with twitter account from file BotDataEarthDay.csv
-            </div>
-            <div>
-                File Preview
-            </div>
-            <div>
-                <table id="previewTable">
-                    <tr>
-                        <th>Account Handle</th>
-                        <th>Account ID</th>
-                        <th>Score</th>
-                        <th>More</th>
-                    </tr>
-                    <tr>
-                        <td>Handle</td>
-                        <td>ID</td>
-                        <td>Score</td>
-                        <td>More</td>
-                    </tr>
-                    <tr>
-                        <td>Handle</td>
-                        <td>ID</td>
-                        <td>Score</td>
-                        <td>More</td>
-                    </tr>
-                    <tr>
-                        <td>Handle</td>
-                        <td>ID</td>
-                        <td>Score</td>
-                        <td>More</td>
-                    </tr>
-                    <tr>
-                        <td>Handle</td>
-                        <td>ID</td>
-                        <td>Score</td>
-                        <td>More</td>
-                    </tr>
-
-                </table>
-            </div>
 
         </div>
 
@@ -73,19 +30,11 @@
                 <h3>File Upload to Fetch Account ID</h3>
             </div>
             <div>
-                <label>Column Number for Account Handle</label>
-                <input type="number" placeholder="3" width="20px" id="accountHandleColumn" for="accountHandleColumn">
-            </div>
-            <div>
-                <button>Select File</button>
-                <button id="fetchIDUpload">FetchID</button>
+                <button id="idFetchButton">FetchID</button>
             </div>
             <br>
         </div>
         <br>
-        <div>
-            File Upload/Select to Monitor Accounts
-        </div>
 
         <br>
 
@@ -94,9 +43,26 @@
                 <h2>Upload a score range and statment file</h2>
             </div>
             <div>
-                <button>Select File</button>
-                <button id="updateScoreStatmentButton">Update Score and Statments</button>
+                <button id="commentsFileButton">Comments File</button>
+                <button id="accountsFileButton">Accounts File</button>
             </div>
+
+            <div>
+
+                <form method="POST" action="/commentFile" enctype="multipart/form-data">
+                    <div>
+                        <label>Upload the pdf</label>
+                        <input type="file" name="commentFile" />
+                    </div>
+                    <div>
+                        <input type="submit" name="btn_upload_profile_pic" value="Upload" />
+
+                        <br>
+                    </div>
+                </form>
+
+            </div>
+
             <br>
         </div>
 
