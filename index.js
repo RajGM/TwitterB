@@ -5,7 +5,6 @@ const bodyparser = require("body-parser");
 
 var fs = require("fs");
 const Twitter = require('twit');
-const callbackURL = "http://127.0.0.1:8000";
 
 const getTweetAndFilter = require("./getTweetsAndFilter");
 
@@ -54,14 +53,7 @@ function createStatusLink(userName, tweetID) {
 
 async function postTweet(textToPost, retweetLink) {
 
-    // Client.post('statuses/update', { status: textToPost, attachment_url: retweetLink }, function (err, data, response) {
-    //     if (err) return console.error(`Encountered error quoting tweet with id: ${retweetLink}, ${new Error(err.message)}`)
-    //     console.log(`Quoted a tweet with id: ${retweetLink}`)
-    //     console.log("Tweet DATA:", data);
-    //     console.log("Response data:", response);
-    // })
-
-    Client.post('statuses/update', { status: textToPost }, function (err, data, response) {
+    Client.post('statuses/update', { status: textToPost, attachment_url: retweetLink }, function (err, data, response) {
         if (err) return console.error(`Encountered error quoting tweet with id: ${retweetLink}, ${new Error(err.message)}`)
         console.log(`Quoted a tweet with id: ${retweetLink}`)
         console.log("Tweet DATA:", data);
@@ -182,7 +174,7 @@ async function checkAllAccounts(CSVdataAccounts, CSVdataComments, tag) {
                 console.log("tweetLink:", tweetLink);
                 console.log("text2post:", text2post);
 
-                //postTweet(text2post, tweetLink); //this is working 
+                postTweet(text2post, tweetLink); 
                 CSVdataAccounts.splice(i, 1);
                 i--;
             }
@@ -205,8 +197,6 @@ async function finalCall() {
 
 }
 
-//finalCall();
-
 function loadTagToMonitor() {
     let file = './tagFile.json'
     jsonfile.readFile(file, function (err, obj) {
@@ -216,7 +206,4 @@ function loadTagToMonitor() {
     })
 }
 
-async function testme(moreText) {
-    console.log("TESTING TESTME");
-    console.log("moreText:", moreText);
-}
+//finalCall();
